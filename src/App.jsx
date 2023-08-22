@@ -1,5 +1,16 @@
 import { useState } from 'react'
 
+const Filter = (props) => {
+  return(
+    <div>
+      filter shown with <input 
+        value={props.filter}
+        onInput={props.handleFilterChanges}
+      />
+    </div>
+  )
+}
+
 const PersonForm = (props) => {
 
   const addName = (event) => {
@@ -19,17 +30,20 @@ const PersonForm = (props) => {
 
   return(
   <form onSubmit={addName}>
-    <div>
-      name: <input 
+    <tr>
+      <td>name: </td><td><input 
          value={props.newName}
          onChange={props.handleNameChanges}
-      />
-    </div>
-    <div>number: <input  
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>number: </td><td><input  
         value={props.newNumber}
         onChange={props.handleNumberChanges}
         />
-    </div>
+      </td>
+    </tr>
     <div>
       <button type="submit">add</button>
     </div>
@@ -37,9 +51,14 @@ const PersonForm = (props) => {
   )
 }
 
-const Persons = ({persons}) => {
+const Persons = (props) => {
+  function checkString(person) {
+    return person.name.toLowerCase().includes(props.filter.toLowerCase())
+  }
+
+  const personsList = props.persons.filter(checkString)
   return(
-    <div>{persons.map(person => 
+    <div>{personsList.map(person => 
       <div key={person.name}>
         {person.name} {person.number}
       </div>
@@ -57,21 +76,25 @@ const App = () => {
   ])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [filter, setFilter] = useState('')
 
   const handleNameChanges = (event) => {
-    console.log(event.target.value)
     setNewName(event.target.value)
   }
 
   const handleNumberChanges = (event) => {
-    console.log(event.target.value)
     setNewNumber(event.target.value)
   }
 
+  const handleFilterChanges = (event) => {
+    setFilter(event.target.value)
+  }
+  
   return (
     <div>
       <h2>Phonebook</h2>
-
+      <Filter filter={filter} handleFilterChanges={handleFilterChanges}/>
+      
       <h3>Add a new</h3>      
       <PersonForm 
         handleNameChanges={handleNameChanges}
@@ -85,7 +108,7 @@ const App = () => {
         />
 
       <h3>Numbers</h3>
-      <Persons persons={persons} />
+      <Persons persons={persons} filter={filter}/>
     </div>
   )
 }
