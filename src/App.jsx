@@ -30,7 +30,7 @@ const PersonForm = (props) => {
 
   return(
   <form onSubmit={addName}>
-    <tr>
+    <table><tbody><tr>
       <td>name: </td><td><input 
          value={props.newName}
          onChange={props.handleNameChanges}
@@ -43,7 +43,7 @@ const PersonForm = (props) => {
         onChange={props.handleNumberChanges}
         />
       </td>
-    </tr>
+    </tr></tbody></table>
     <div>
       <button type="submit">add</button>
     </div>
