@@ -24,10 +24,16 @@ const PersonForm = (props) => {
     const names = props.persons.map(persons => persons.name)
     names.includes(props.newName) 
       ? alert(`${props.newName} is already added to phonebook`) 
-      : props.setPersons(props.persons.concat(personObject))
+      : axios
+        .post('http://localhost:3001/persons', personObject)
+        .then(response => {
+          props.setPersons(props.persons.concat(response.data))
+        })
     props.setNewName('')
     props.setNewNumber('')
   }
+
+  
 
   return(
   <form onSubmit={addName}>
