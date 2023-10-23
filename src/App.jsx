@@ -20,7 +20,6 @@ const PersonForm = (props) => {
       name: props.newName,
       number: props.newNumber
     }
-    //Checks if the name is already in the phonebook
     const names = props.persons.map(persons => persons.name)
     names.includes(props.newName) 
       ? alert(`${props.newName} is already added to phonebook`) 
@@ -30,10 +29,8 @@ const PersonForm = (props) => {
         props.setPersons(props.persons.concat(response.data))
       })
     props.setNewName('')
-    props.setNewNumber('')
+    props.setNewNumber('')    
   }
-
-  
 
   return(
   <form onSubmit={addName}>
@@ -52,7 +49,7 @@ const PersonForm = (props) => {
       </td>
     </tr></tbody></table>
     <div>
-      <button type="submit">add</button>
+      <button type="submit">Add</button>
     </div>
   </form>
   )
@@ -63,11 +60,21 @@ const Persons = (props) => {
     return person.name.toLowerCase().includes(props.filter.toLowerCase())
   }
 
+  const removePerson = (id, name) => {
+    if (window.confirm(`Delete ${name}?`)) {
+      personService
+      .remove(id)
+      .then(location.reload())
+    }
+  }
+
   const personsList = props.persons.filter(checkString)
   return(
+
     <div>{personsList.map(person => 
-      <div key={person.name}>
+      <div key={person.id}>
         {person.name} {person.number}
+        <button onClick={() => removePerson(person.id, person.name)}>Delete</button>
       </div>
       )}
     </div>
