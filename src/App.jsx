@@ -21,17 +21,22 @@ const PersonForm = (props) => {
       number: props.newNumber
     }
     const names = props.persons.map(persons => persons.name)
-    names.includes(props.newName) 
-      ? alert(`${props.newName} is already added to phonebook`) 
-      : personService
+    if (!names.includes(props.newName)){
+      personService
       .create(personObject)
       .then(response => {
         props.setPersons(props.persons.concat(response.data))
       })
+    } else if (window.confirm(`${props.newName} is already added to phonebook, replace the old numer with the new one?`)){
+      const existingPersonId = (element) => element === props.newName
+      personService
+      .update(names.findIndex(existingPersonId) + 1, personObject)
+      .then(location.reload())
+    }
+    
     props.setNewName('')
     props.setNewNumber('')    
   }
-
   return(
   <form onSubmit={addName}>
     <table><tbody><tr>
@@ -70,14 +75,15 @@ const Persons = (props) => {
 
   const personsList = props.persons.filter(checkString)
   return(
-
-    <div>{personsList.map(person => 
-      <div key={person.id}>
-        {person.name} {person.number}
-        <button onClick={() => removePerson(person.id, person.name)}>Delete</button>
-      </div>
+    <table>
+      <tbody>{personsList.map(person => 
+      <tr key={person.id}>
+        <td>{person.name}</td><td>{person.number}</td>
+        <td><button onClick={() => removePerson(person.id, person.name)}>Delete</button></td>
+      </tr>
       )}
-    </div>
+      </tbody>
+    </table>
   )
 }
 
