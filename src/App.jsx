@@ -12,80 +12,46 @@ const Filter = (props) => {
   )
 }
 
-const PersonForm = (props) => {
-
-  const addName = (event) => {
-    event.preventDefault()
-    const personObject = {
-      name: props.newName,
-      number: props.newNumber
-    }
-    const names = props.persons.map(persons => persons.name)
-    if (!names.includes(props.newName)){
-      personService
-      .create(personObject)
-      .then(response => {
-        props.setPersons(props.persons.concat(response.data))
-      })
-    } else if (window.confirm(`${props.newName} is already added to phonebook, replace the old numer with the new one?`)){
-      const existingPersonId = (element) => element === props.newName
-      personService
-      .update(names.findIndex(existingPersonId) + 1, personObject)
-      .then(location.reload())
-    }
-    
-    props.setNewName('')
-    props.setNewNumber('')    
-  }
-  return(
-  <form onSubmit={addName}>
-    <table><tbody><tr>
-      <td>name: </td><td><input 
-         value={props.newName}
-         onChange={props.handleNameChanges}
-        />
-      </td>
-    </tr>
-    <tr>
-      <td>number: </td><td><input  
-        value={props.newNumber}
-        onChange={props.handleNumberChanges}
-        />
-      </td>
-    </tr></tbody></table>
-    <div>
-      <button type="submit">Add</button>
-    </div>
-  </form>
-  )
-}
-
 const Persons = (props) => {
+  
   function checkString(person) {
     return person.name.toLowerCase().includes(props.filter.toLowerCase())
   }
 
-  const removePerson = (id, name) => {
-    if (window.confirm(`Delete ${name}?`)) {
-      personService
-      .remove(id)
-      .then(location.reload())
-    }
-  }
-
-  const personsList = props.persons.filter(checkString)
+  const personList = props.persons.filter(checkString)
   return(
-    <table>
-      <tbody>{personsList.map(person => 
-      <tr key={person.id}>
-        <td>{person.name}</td><td>{person.number}</td>
-        <td><button onClick={() => removePerson(person.id, person.name)}>Delete</button></td>
-      </tr>
+    <div>{personList.map(person => 
+      <div key={person.id}>
+        {person.name} {person.number}
+        <button onClick={() => props.removePerson(person.id, person.name)}>Delete</button>
+      </div>
       )}
-      </tbody>
-    </table>
+    </div>
   )
 }
+
+const PersonForm = (props) => {
+
+  return (
+    <form onSubmit={props.addName}>
+      <div>
+        name: <input 
+          value={props.newName}
+          onChange={props.handleNameChanges}
+        />
+      </div>
+      <div>number: <input  
+          value={props.newNumber}
+          onChange={props.handleNumberChanges}
+          />
+      </div>
+      <div>
+        <button type="submit">Add</button>
+      </div>
+    </form>
+  )
+}
+
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -101,6 +67,41 @@ const App = () => {
       })
   }, [])
 
+  const addName = (event) => {
+    event.preventDefault()
+    const personObject = {
+      name: newName,
+      number: newNumber
+    }
+    
+    if (!persons.map(persons => persons.name).includes(newName)){
+      personService
+          .create(personObject)
+          .then(response => {
+            setPersons(persons.concat(response.data))
+          })
+    } else if (window.confirm(`${newName} is already added to phonebook.
+        Replace the old numer with the new one?`)){
+          const id = persons.findIndex((existingPerson) => existingPerson.name === newName) + 1
+          const updatedPerson = {...personObject, number: newNumber}
+          personService
+            .update(id, updatedPerson)
+            .then(setPersons(persons.map(person => person.id !== id ? person : updatedPerson)))
+      }
+      
+    setNewName('')
+    setNewNumber('')
+  }
+
+  const removePerson = (id, name) => {
+    if (window.confirm(`Delete ${name}?`)) {
+      personService
+      .remove(id)
+      .then(setPersons(persons.filter((person) => person.id !== id))
+      )
+    }
+  }
+
   const handleNameChanges = (event) => {
     setNewName(event.target.value)
   }
@@ -112,26 +113,26 @@ const App = () => {
   const handleFilterChanges = (event) => {
     setFilter(event.target.value)
   }
-  
+
   return (
     <div>
       <h2>Phonebook</h2>
       <Filter filter={filter} handleFilterChanges={handleFilterChanges}/>
       
-      <h3>Add a new</h3>      
+      <h3>Add contact</h3>
       <PersonForm 
-        handleNameChanges={handleNameChanges}
-        handleNumberChanges={handleNumberChanges}
+        addName={addName}
         newName={newName}
         newNumber={newNumber}
-        persons={persons}
-        setPersons={setPersons}
-        setNewName={setNewName}
-        setNewNumber={setNewNumber}
+        handleNameChanges={handleNameChanges}
+        handleNumberChanges={handleNumberChanges}
         />
-
+      
       <h3>Numbers</h3>
-      <Persons persons={persons} filter={filter}/>
+      <Persons 
+        persons={persons} 
+        filter={filter}
+        removePerson={removePerson}/>
     </div>
   )
 }
