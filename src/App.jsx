@@ -52,12 +52,25 @@ const PersonForm = (props) => {
   )
 }
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="message">
+      {message}
+    </div>
+  )
+}
+
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     personService
@@ -79,6 +92,12 @@ const App = () => {
           .create(personObject)
           .then(response => {
             setPersons(persons.concat(response.data))
+            setMessage(
+              `Added ${newName}`
+            )
+            setTimeout(() => {
+              setMessage(null)
+            }, 3000)
           })
     } else if (window.confirm(`${newName} is already added to phonebook.
         Replace the old numer with the new one?`)){
@@ -86,7 +105,15 @@ const App = () => {
           const updatedPerson = {...personObject, number: newNumber}
           personService
             .update(existingPersonId, updatedPerson)
-            .then(setPersons(persons.map(person => person.id !== existingPersonId ? person : updatedPerson)))
+            .then(
+              setPersons(persons.map(person => person.id !== existingPersonId ? person : updatedPerson)),
+              setMessage(
+                `Updated ${newName}`
+              ),
+              setTimeout(() => {
+                setMessage(null)
+              }, 3000))
+            
       }
       
     setNewName('')
@@ -97,7 +124,14 @@ const App = () => {
     if (window.confirm(`Delete ${name}?`)) {
       personService
       .remove(id)
-      .then(setPersons(persons.filter((person) => person.id !== id))
+      .then(
+        setPersons(persons.filter((person) => person.id !== id)),
+        setMessage(
+          `${name} deleted`
+        ),
+        setTimeout(() => {
+          setMessage(null)
+        }, 3000)
       )
     }
   }
@@ -116,7 +150,8 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h1>Phonebook</h1>
+      <Notification message={message} />
       <Filter filter={filter} handleFilterChanges={handleFilterChanges}/>
       
       <h3>Add contact</h3>
