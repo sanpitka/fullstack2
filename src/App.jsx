@@ -104,16 +104,14 @@ const App = () => {
       personService
           .create(personObject)
           .then(response => {
-            if (newName.length >= 3) {
-              setPersons(persons.concat(response.data))
-              setMessage(
-                `Added ${newName}`
-              )
-              setTimeout(() => {
-                setMessage(null)
-              }, 3000)
-            }
-            })            
+            setPersons(persons.concat(response.data))
+            setMessage(
+              `Added ${newName}`
+            )
+            setTimeout(() => {
+              setMessage(null)
+            }, 3000)
+          })
           .catch(error => {
             console.log(error.response.data)
           })
