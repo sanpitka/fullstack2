@@ -104,13 +104,18 @@ const App = () => {
       personService
           .create(personObject)
           .then(response => {
-            setPersons(persons.concat(response.data))
-            setMessage(
-              `Added ${newName}`
-            )
-            setTimeout(() => {
-              setMessage(null)
-            }, 3000)
+            if (newName.length >= 3) {
+              setPersons(persons.concat(response.data))
+              setMessage(
+                `Added ${newName}`
+              )
+              setTimeout(() => {
+                setMessage(null)
+              }, 3000)
+            }
+            })            
+          .catch(error => {
+            console.log(error.response.data)
           })
     } else if (window.confirm(`${newName} is already added to phonebook.
         Replace the old numer with the new one?`)){
