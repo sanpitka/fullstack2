@@ -113,6 +113,7 @@ const App = () => {
             }, 3000)
           })
           .catch(error => {
+            console.log("Uu, nakkivene!")
             setMessage(null)
             setErrorMessage(error.response.data.error),
             setTimeout(() => {
