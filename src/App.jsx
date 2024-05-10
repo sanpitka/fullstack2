@@ -113,14 +113,11 @@ const App = () => {
             }, 3000)
           })
           .catch(error => {
-            if (error.response || error.response.data) {
               setMessage(null)
               setErrorMessage(error.response.data.error),
               setTimeout(() => {
                 setErrorMessage(null)
               }, 3000)
-            }
-            
           })
     } else if (window.confirm(`${newName} is already added to phonebook.
         Replace the old numer with the new one?`)){
