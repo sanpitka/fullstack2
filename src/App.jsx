@@ -112,20 +112,26 @@ const App = () => {
               setMessage(null)
             }, 3000)
           })
+          .catch(error => {
+            setMessage(null)
+            setErrorMessage(error.response.data.error)
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 3000)
+          })
     } else if (window.confirm(`${newName} is already added to phonebook.
         Replace the old numer with the new one?`)){
-          const existingPersonId = persons.findIndex((existingPerson) => existingPerson.name === newName) + 1
+          const existingPersonId = persons.find(person => person.name === newName).id
           const updatedPerson = {...personObject, number: newNumber}
           personService
             .update(existingPersonId, updatedPerson)
-            .then(
-              setPersons(persons.map(person => person.id !== existingPersonId ? person : updatedPerson)),
-              setMessage(
-                `Updated ${newName}`
-              ),
+            .then(() => {
+              setPersons(persons.map(person => person.id !== existingPersonId ? person : updatedPerson));
+              setMessage(`Updated ${newName}`);
               setTimeout(() => {
-                setMessage(null)
-              }, 3000))
+                setMessage(null);
+              }, 3000);
+            })
             .catch(error => {
               setMessage(null)
               setErrorMessage(
